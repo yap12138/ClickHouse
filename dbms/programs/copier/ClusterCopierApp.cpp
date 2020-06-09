@@ -18,6 +18,7 @@ void ClusterCopierApp::initialize(Poco::Util::Application & self)
     if (config().has("copy-fault-probability"))
         copy_fault_probability = std::max(std::min(config().getDouble("copy-fault-probability"), 1.0), 0.0);
     base_dir = (config().has("base-dir")) ? config().getString("base-dir") : Poco::Path::current();
+    is_skip_clean_parts = config().has("safe-mode-skip-clean");
     // process_id is '<hostname>#<start_timestamp>_<pid>'
     time_t timestamp = Poco::Timestamp().epochTime();
     auto curr_pid = Poco::Process::id();
@@ -71,6 +72,8 @@ void ClusterCopierApp::defineOptions(Poco::Util::OptionSet & options)
                               .argument("log-level").binding("log-level"));
     options.addOption(Poco::Util::Option("base-dir", "", "base directory for copiers, consecutive copier launches will populate /base-dir/launch_id/* directories")
                               .argument("base-dir").binding("base-dir"));
+    options.addOption(Poco::Util::Option("safe-mode-skip-clean", "", "skip ALTER DROP PARTITION, retain destination partition")
+                              .binding("safe-mode-skip-clean"));
 
     using Me = std::decay_t<decltype(*this)>;
     options.addOption(Poco::Util::Option("help", "", "produce this help message").binding("help")
@@ -114,6 +117,7 @@ void ClusterCopierApp::mainImpl()
 
     auto copier = std::make_unique<ClusterCopier>(task_path, host_id, default_database, *context);
     copier->setSafeMode(is_safe_mode);
+    copier->setSkipCleanParts(is_skip_clean_parts);
     copier->setCopyFaultProbability(copy_fault_probability);
 
     auto task_file = config().getString("task-file", "");

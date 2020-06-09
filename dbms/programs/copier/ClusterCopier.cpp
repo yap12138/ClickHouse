@@ -893,7 +893,7 @@ PartitionTaskStatus ClusterCopier::processPartitionTaskImpl(const ConnectionTime
         LOG_DEBUG(log, "Partition " << task_partition.name << " appears to be clean");
         zookeeper->createAncestors(current_task_status_path);
     }
-    else
+    else if (!is_skip_clean_parts)
     {
         LOG_DEBUG(log, "Partition " << task_partition.name << " is dirty, try to drop it");
 
@@ -974,7 +974,7 @@ PartitionTaskStatus ClusterCopier::processPartitionTaskImpl(const ConnectionTime
             zookeeper->get(task_partition.getPartitionShardsPath(), &stat_shards);
 
             /// NOTE: partition is still fresh if dirt discovery happens before cleaning
-            if (stat_shards.numChildren == 0)
+            if (!is_skip_clean_parts && stat_shards.numChildren == 0)
             {
                 LOG_WARNING(log, "There are no workers for partition " << task_partition.name
                                  << ", but destination table contains " << count << " rows"

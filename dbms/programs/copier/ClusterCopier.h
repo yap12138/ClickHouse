@@ -49,6 +49,11 @@ public:
         is_safe_mode = is_safe_mode_;
     }
 
+    void setSkipCleanParts(bool is_skip_clean_parts_ = true)
+    {
+        is_skip_clean_parts = is_skip_clean_parts_;
+    }
+
     void setCopyFaultProbability(double copy_fault_probability_)
     {
         copy_fault_probability = copy_fault_probability_;
@@ -164,6 +169,7 @@ private:
     std::unique_ptr<TaskCluster> task_cluster;
 
     bool is_safe_mode = false;
+    bool is_skip_clean_parts = false;
     double copy_fault_probability = 0.0;
 
     Context & context;
