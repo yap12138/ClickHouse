@@ -109,7 +109,7 @@ ASTPtr extractPartitionKey(const ASTPtr & storage_ast)
             throw Exception("Expected at least " + toString(min_args) + " arguments in " + storage_str,
                             ErrorCodes::BAD_ARGUMENTS);
 
-        ASTPtr & month_arg = is_replicated ? arguments[2] : arguments[1];
+        ASTPtr & month_arg = is_replicated ? arguments[2] : arguments[0];
         return makeASTFunction("toYYYYMM", month_arg->clone());
     }
 }
