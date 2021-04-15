@@ -129,6 +129,7 @@ SRCS(
     caseWithExpression.cpp
     cbrt.cpp
     coalesce.cpp
+    compareVersion.cpp
     concat.cpp
     convertCharset.cpp
     cos.cpp
